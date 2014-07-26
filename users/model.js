@@ -28,7 +28,8 @@ var userSchema = new mongoose.Schema({
     latitude: Number,
     device: String,
     tokens: [String],
-    friends: [String]
+    friends: [String],
+    pending: [String]
 });
 
 module.exports = mongoose.model('User', userSchema);

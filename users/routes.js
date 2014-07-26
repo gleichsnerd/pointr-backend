@@ -270,9 +270,102 @@ var friends = {
 
         /*
         *  Add a friend
+        *  @param accessToken
+        *  @param username
+        *  @param friend_username
         */
         add: function(req, res) {
-            res.send('test');
+            var p = req.body;
+            // Get both users
+            User.findOne({ username: p.username }, function (e, user) {
+                if (user) {
+                    User.findOne({ username: p.friend_username }, function (e, friend) {
+                        if (friend) {
+                            // Check if username is in friend_username.pending
+                            var isPending = false;
+                            for (var i = 0; i < friend.pending.length; ++i) {
+                                if (user.username == friend.pending[i]) {
+                                    isPending = true;
+                                    break;
+                                }
+                            }
+                            if (isPending) {
+                                // Move friend to user.friends
+                                user.friends.push(friend.username);
+                                user.save(function (e) {
+                                    if (!e) {
+                                        // Move user to friend.friends
+                                        friend.friends.push(user.username);
+                                        friend.save(function (e) {
+                                            if (!e) {
+                                                // Everything was successful!
+                                                return res.send({
+                                                    "success": true,
+                                                    "message": ""
+                                                });
+                                            } else {
+                                                // Database error
+                                                return res.send({
+                                                    "success": false,
+                                                    "message": "INTERNAL ERROR"
+                                                });
+                                            }
+                                        });
+                                    } else {
+                                        // Database error
+                                        return res.send({
+                                            "success": false,
+                                            "message": "INTERNAL ERROR"
+                                        })
+                                    }
+                                });
+                            } else {
+                                // Put user in friend.pending
+                                friend.pending.push(user.username);
+                                user.save(function (e) {
+                                    if (!e) {
+                                        // Put friend in user.pending
+                                        user.pending.push(friend.username);
+                                        user.save(function (e) {
+                                            if (!e) {
+                                                // Everything worked!
+                                                return res.send({
+                                                    "success": true,
+                                                    "message": ""
+                                                });
+                                            } else {
+                                                // Database error
+                                                return res.send({
+                                                    "success": false,
+                                                    "message": "INTERNAL ERROR"
+                                                });
+                                            }
+                                        })
+                                    } else {
+                                        // Database error
+                                        return res.send({
+                                            "success": false,
+                                            "message": "INTERNAL ERROR"
+                                        });
+                                    }
+                                });
+                            }
+                        } else {
+                            // Friend not found
+                            return res.send({
+                                "success": false,
+                                "message": "BAD USERNAME"
+                            });
+                        }
+                    });
+                } else {
+                    // User not found
+                    return res.send({
+                        "success": false,
+                        "message": "BAD USERNAME"
+                    });
+                }
+            });
         },
 
         /*

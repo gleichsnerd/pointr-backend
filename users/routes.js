@@ -4,7 +4,8 @@
 
 var User = require('./model'),
     random = require('../helpers/random'),
-    bcrypt = require('bcrypt');
+    bcrypt = require('bcrypt'),
+    check = require('../helpers/check');
 
 var user = {
 
@@ -134,14 +135,7 @@ var user = {
             User.findOne({ username: p.username }, function (e, user) {
                 if (user) {
                     // Check the token
-                    var passed = false;
-                    for (var i = 0; user.tokens.length; ++i) {
-                        if (user.tokens[i] == p.accessToken) {
-                            passed = true;
-                            break;
-                        }
-                    }
-                    if (passed) {
+                    if (check.token(p.accessToken, user.tokens)) {
                         // Set lat and long
                         user.latitude = p.latitude;
                         user.longitude = p.longitude;
@@ -204,16 +198,66 @@ var user = {
 
         /*
         *  Get a user's location
+        *  @todo push notifications
+        *  @param accessToken
+        *  @param username
         */
         location: function(req, res) {
-            res.send('test');
+            User.findOne({ username: p.username }, function (e, user) {
+                if (user) {
+                    // Return the location
+                    return res.send({
+                        "success": true,
+                        "latitude": user.latitude,
+                        "longitude": user.longitude,
+                        "message": ""
+                    });
+                } else {
+                    // User not found
+                    return res.send({
+                        "success": false,
+                        "latitude": 0.0,
+                        "longitude": 0.0,
+                        "message": "BAD USERNAME"
+                    });
+                }
+            });
         },
 
         /*
         *  Get a user's device id
+        *  @param accessToken
+        *  @param username
         */
         device: function(req, res) {
-            res.send('test');
+            var p = req.body;
+            User.findOne({ username: p.username }, function (e, user) {
+                if (user) {
+                    // Check access token
+                    if (check.token(p.accessToken, user.tokens)) {
+                        // Everything worked
+                        return res.send({
+                            "success": true,
+                            "message": "",
+                            "device": user.device
+                        });
+                    } else {
+                        // Bad access token
+                        return res.send({
+                            "success": false,
+                            "message": "BAD ACCESS TOKEN",
+                            "device": ""
+                        });
+                    }
+                } else {
+                    // Bad username
+                    return res.send({
+                        "success": false,
+                        "message": "BAD USERNAME",
+                        "device": ""
+                    });
+                }
+            });
         }
 
     }

@@ -184,9 +184,22 @@ var user = {
 
         /*
         *  Get a user object
+        *  @param username
         */
         self: function(req, res) {
-            res.send('test');
+            var p = req.body;
+            User.findOne({ username: p.username }, 'username longitude latitude device friends', function (e, user) {
+                if (user) {
+                    // Return the user object
+                    return res.send(user);
+                } else {
+                    // Invalid username
+                    return res.send({
+                        "success": false,
+                        "message": "BAD USERNAME"
+                    });
+                }
+            });
         },
 
         /*

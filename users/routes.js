@@ -258,6 +258,48 @@ var user = {
                     });
                 }
             });
+        },
+
+        /*
+        *  Get a list of friends
+        *  @param accessToken
+        *  @param username
+        */
+        friends: function(req, res) {
+            var p = req.body;
+            // Get the user
+            User.findOne({ username: p.username }, function (e, user) {
+                if (user) {
+                    // Check access token
+                    if (check.token(p.accessToken, user.tokens)) {
+                        var friends = [];
+                        user.friends.forEach(function (name) {
+                            User.findOne({ username: name }, function (e, fr) {
+                                if (fr) {
+                                    friends.push({
+                                        "username": fr.username,
+                                        "latitude": fr.latitude,
+                                        "longitude": fr.longitude
+                                    });
+                                    return res.send(friends);
+                                }
+                            });
+                        });
+                    } else {
+                        // Bad access token
+                        return res.send({
+                            "success": false,
+                            "message": "BAD ACCESS TOKEN"
+                        });
+                    }
+                } else {
+                    // User not found
+                    return res.send({
+                        "success": false,
+                        "message": "BAD USERNAME"
+                    });
+                }
+            });
         }
 
     }
@@ -412,6 +454,9 @@ function setup(app) {
 
     app.route('/user/device')
         .get(user.get.device);
+
+    app.route('/user/friends')
+        .get(user.get.friends);
 
     /*
     *  /friends routes

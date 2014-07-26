@@ -12,6 +12,8 @@ var user = {
 
         /*
         *  Login
+        *  @param username
+        *  @param password
         */
         login: function(req, res) {
             var p = req.body;
@@ -31,7 +33,7 @@ var user = {
                                 return res.send({
                                     "success": false,
                                     "accessToken": "",
-                                    "message": "Error getting new token."
+                                    "message": "INTERNAL ERROR"
                                 });
                             } else {
                                 // Total success
@@ -48,7 +50,7 @@ var user = {
                         return res.send({
                             "success": false,
                             "accessToken": "",
-                            "message": "Your username or password was incorrect."
+                            "message": "BAD PASSWORD"
                         });
                     }
                 } else {
@@ -57,7 +59,7 @@ var user = {
                     return res.send({
                         "success": false,
                         "accessToken": "",
-                        "message": "Your username or password was incorrect."
+                        "message": "BAD USERNAME"
                     });
                 }
             });
@@ -65,6 +67,9 @@ var user = {
 
         /*
         *  Register
+        *  @param username
+        *  @param password
+        *  @param device
         */
         register: function(req, res) {
             var p = req.body;
@@ -92,7 +97,7 @@ var user = {
                             return res.send({
                                 "success": false,
                                 "accessToken": "",
-                                "message": "The user could not be saved."
+                                "message": "INTERNAL ERROR"
                             });
                         }
                         else
@@ -110,7 +115,7 @@ var user = {
                     return res.send({
                         "success": false,
                         "accessToken": "",
-                        "message": "Username already exists"
+                        "message": "USERNAME EXISTS"
                     });
                 }
             });
@@ -118,9 +123,59 @@ var user = {
 
         /*
         *  Update a user's location
+        *  @param accessToken
+        *  @param username
+        *  @param latitude
+        *  @param longitude
         */
         location: function(req, res) {
-            res.send('test');
+            var p = req.body;
+            // Get the user
+            User.findOne({ username: p.username }, function (e, user) {
+                if (user) {
+                    // Check the token
+                    var passed = false;
+                    for (var i = 0; user.tokens.length; ++i) {
+                        if (user.tokens[i] == p.accessToken) {
+                            passed = true;
+                            break;
+                        }
+                    }
+                    if (passed) {
+                        // Set lat and long
+                        user.latitude = p.latitude;
+                        user.longitude = p.longitude;
+                        // Save users
+                        user.save(function (e) {
+                            if (e) {
+                                // Internal error
+                                return res.send({
+                                    "success": false,
+                                    "message": "INTERNAL ERROR"
+                                });
+                            } else {
+                                // Everything worked
+                                return res.send({
+                                    "success": true,
+                                    "message": ""
+                                });
+                            }
+                        });
+                    } else {
+                        // Return access token error
+                        return res.send({
+                            "success": false,
+                            "message": "BAD ACCESS TOKEN"
+                        });
+                    }
+                } else {
+                    // User not found
+                    return res.send({
+                        "success": false,
+                        "message": "USER NOT FOUND"
+                    });
+                }
+            });
         }
 
     },

@@ -412,9 +412,12 @@ var friends = {
 
         /*
         *  Reject a friend
+        *  @param accessToken
+        *  @param username
+        *  @param friend_username
         */
         reject: function(req, res) {
-            res.send('test');
+
         }
 
     },

@@ -30,7 +30,6 @@ var user = {
                         user.save(function (e) {
                             if (e) {
                                 // Error saving to db
-                                console.log(e);
                                 return res.send({
                                     "success": false,
                                     "accessToken": "",
@@ -47,7 +46,6 @@ var user = {
                         });
                     } else {
                         // Incorrect password
-                        console.log("incorrect password");
                         return res.send({
                             "success": false,
                             "accessToken": "",
@@ -56,7 +54,6 @@ var user = {
                     }
                 } else {
                     // Incorrect username
-                    console.log("incorrect username");
                     return res.send({
                         "success": false,
                         "accessToken": "",
@@ -93,7 +90,6 @@ var user = {
                     // Save the new user
                     user.save(function (e) {
                         if (e) {
-                            console.log(e);
                             // Error saving user
                             return res.send({
                                 "success": false,

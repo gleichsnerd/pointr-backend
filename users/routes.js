@@ -181,7 +181,7 @@ var user = {
         *  @param username
         */
         self: function(req, res) {
-            var p = req.body;
+            var p = req.query;
             User.findOne({ username: p.username }, 'username longitude latitude device friends', function (e, user) {
                 if (user) {
                     // Return the user object
@@ -203,6 +203,7 @@ var user = {
         *  @param username
         */
         location: function(req, res) {
+            var p = req.query;
             User.findOne({ username: p.username }, function (e, user) {
                 if (user) {
                     // Return the location
@@ -230,7 +231,7 @@ var user = {
         *  @param username
         */
         device: function(req, res) {
-            var p = req.body;
+            var p = req.query;
             User.findOne({ username: p.username }, function (e, user) {
                 if (user) {
                     // Check access token
@@ -266,7 +267,7 @@ var user = {
         *  @param username
         */
         friends: function(req, res) {
-            var p = req.body;
+            var p = req.query;
             // Get the user
             User.findOne({ username: p.username }, function (e, user) {
                 if (user) {
@@ -334,10 +335,18 @@ var friends = {
                             if (isPending) {
                                 // Move friend to user.friends
                                 user.friends.push(friend.username);
+                                var index = user.pending.indexOf(friend.username);
+                                if (index > -1) {
+                                    user.pending.splice(index, 1);
+                                }
                                 user.save(function (e) {
                                     if (!e) {
                                         // Move user to friend.friends
                                         friend.friends.push(user.username);
+                                        var i = friend.pending.indexOf(user.username);
+                                        if (index > -1) {
+                                            friend.pending.splice(i, 1);
+                                        }
                                         friend.save(function (e) {
                                             if (!e) {
                                                 // Everything was successful!
@@ -417,7 +426,46 @@ var friends = {
         *  @param friend_username
         */
         reject: function(req, res) {
-
+            var p = req.body;
+            // Remove friend from username.pending
+            User.findOne({ username: p.username }, function(e, user) {
+                var i = user.pending.indexOf(p.friend_username);
+                if (i > -1) {
+                    user.pending.splice(i, 1);
+                }
+                user.save(function (e) {
+                    if (!e) {
+                        // Remove username from friend.pending
+                        User.findOne({ username: p.friend_username }, function (e, friend) {
+                            var j = friend.pending.indexOf(user.username);
+                            if (j > -1) {
+                                friend.pending.splice(j, 1);
+                            }
+                            friend.save(function (e) {
+                                if (!e) {
+                                    // Everything worked
+                                    return res.send({
+                                        "success": true,
+                                        "message": ""
+                                    });
+                                } else {
+                                    // DB error
+                                    return res.send({
+                                        "success": false,
+                                        "message": "INTERNAL ERROR"
+                                    });
+                                }
+                            });
+                        });
+                    } else {
+                        // DB error
+                        return res.send({
+                            "success": false,
+                            "message": "INTERNAL ERROR"
+                        });
+                    }
+                });
+            });
         }
 
     },
@@ -426,9 +474,30 @@ var friends = {
 
         /*
         *  Get a friend's location
+        *  @param username
+        *  @param accessToken
         */
         location: function(req, res) {
-            res.send('test');
+            var p = req.query;
+            User.findOne({ username: p.username }, function (e, user) {
+                if (user) {
+                    // found user
+                    return res.send({
+                        "success": true,
+                        "message": "",
+                        "latitude": user.latitude,
+                        "longitude": user.longitude
+                    });
+                } else {
+                    // user doesn't exist
+                    return res.send({
+                        "success": false,
+                        "message": "BAD USERNAME",
+                        "latitude": 0.0,
+                        "longitude": 0.0
+                    });
+                }
+            });
         }
 
     }

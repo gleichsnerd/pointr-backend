@@ -282,9 +282,23 @@ var user = {
                                         "latitude": fr.latitude,
                                         "longitude": fr.longitude
                                     });
-                                    return res.send(friends);
+                                    return res.send({
+                                        "success": true,
+                                        "friends": friends,
+                                        "message": ""
+                                    });
+                                } else {
+                                    return res.send({
+                                        "success": false,
+                                        "message": "BAD USERNAME"
+                                    });
                                 }
                             });
+                        });
+                        return res.send({
+                            "success": true,
+                            "friends": [],
+                            "message": ""
                         });
                     } else {
                         // Bad access token

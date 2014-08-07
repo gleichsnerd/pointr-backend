@@ -1,4 +1,4 @@
-pointr-backend
+Pointr Backend
 ==============
 
-Friend finding compass app
+Friend-based wayfinding.

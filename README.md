@@ -1,5 +1,7 @@
-Pointr API Docs
+Pointr
 ==============
+Friend-based wayfinding.
+--------------
 
 ## Base URL
 

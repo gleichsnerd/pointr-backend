@@ -1,5 +1,7 @@
 /*
 *  All routes for the User model
+*  @todo fix the way we check access tokens in every route (middleware)
+*  @todo implement a client secret code
 */
 
 var User = require('./model'),
@@ -194,7 +196,6 @@ var user = {
 
         /*
         *  Get a user's location
-        *  @todo push notifications
         *  @param accessToken
         *  @param username
         */

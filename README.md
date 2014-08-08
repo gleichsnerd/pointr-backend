@@ -264,7 +264,7 @@ Friend-based wayfinding.
 
 ### /friends/location
 
-### POST
+### GET
 
  - accessToken
  - username (of friend)

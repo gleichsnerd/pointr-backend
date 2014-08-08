@@ -168,6 +168,56 @@ var user = {
                     });
                 }
             });
+        },
+
+        /*
+        *  Update a user's device
+        *  @param accessToken
+        *  @param username
+        *  @param device
+        *  @param deviceType
+        */
+        device: function(req, res) {
+            var p = req.body;
+            // Get the user
+            User.findOne({ username: p.username }, function (e, user) {
+                if (user) {
+                    // Check the token
+                    if (check.token(p.accessToken, user.tokens)) {
+                        // Set device and deviceType
+                        user.device = p.device;
+                        user.deviceType = p.deviceType;
+                        // Save users
+                        user.save(function (e) {
+                            if (e) {
+                                // Internal error
+                                return res.send({
+                                    "success": false,
+                                    "message": "INTERNAL ERROR"
+                                });
+                            } else {
+                                // Everything worked
+                                return res.send({
+                                    "success": true,
+                                    "message": ""
+                                });
+                            }
+                        });
+                    } else {
+                        // Return access token error
+                        return res.send({
+                            "success": false,
+                            "message": "BAD ACCESS TOKEN"
+                        });
+                    }
+                } else {
+                    // User not found
+                    return res.send({
+                        "success": false,
+                        "message": "USER NOT FOUND"
+                    });
+                }
+            });
         }
 
     },
@@ -384,7 +434,7 @@ var friends = {
                             } else {
                                 // Put user in friend.pending
                                 friend.pending.push(user.username);
-                                user.save(function (e) {
+                                friend.save(function (e) {
                                     if (!e) {
                                         // Put friend in user.pending
                                         user.pending.push(friend.username);
@@ -536,6 +586,7 @@ function setup(app) {
         .get(user.get.location);
 
     app.route('/user/device')
+        .post(user.post.device)
         .get(user.get.device);
 
     app.route('/user/friends')

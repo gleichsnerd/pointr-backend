@@ -25,6 +25,7 @@ var userSchema = new mongoose.Schema({
     longitude: Number,
     latitude: Number,
     device: String,
+    deviceType: String,
     tokens: [String],
     friends: [String],
     pending: [String]

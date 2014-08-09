@@ -320,32 +320,10 @@ var user = {
                 if (user) {
                     // Check access token
                     if (check.token(p.accessToken, user.tokens)) {
-                        var friends = [];
-                        user.friends.forEach(function (name) {
-                            User.findOne({ username: name }, function (e, fr) {
-                                if (fr) {
-                                    friends.push({
-                                        "username": fr.username,
-                                        "latitude": fr.latitude,
-                                        "longitude": fr.longitude
-                                    });
-                                    return res.send({
-                                        "success": true,
-                                        "friends": friends,
-                                        "message": ""
-                                    });
-                                } else {
-                                    return res.send({
-                                        "success": false,
-                                        "message": "BAD USERNAME"
-                                    });
-                                }
-                            });
-                        });
                         return res.send({
                             "success": true,
-                            "friends": [],
-                            "message": ""
+                            "friends": user.friends,
+                            "suitors": user.pending
                         });
                     } else {
                         // Bad access token

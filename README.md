@@ -190,13 +190,8 @@ Friend-based wayfinding.
 // Success
 {
     "success": true,
-    "friends": [
-        {
-            "username": "man",
-            "latitude": 24.2347,
-            "longitude": 12.2661
-        }
-    ],
+    "friends": [ "steve", "sergei", "bill" ],
+    "suitors": [ "elon" ],
     "message": ""
 }
 
@@ -204,6 +199,7 @@ Friend-based wayfinding.
 {
     "success": true,
     "friends": [],
+    "suitors": [],
     "message": ""
 }
 

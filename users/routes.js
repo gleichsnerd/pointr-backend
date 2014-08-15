@@ -320,10 +320,14 @@ var user = {
                 if (user) {
                     // Check access token
                     if (check.token(p.accessToken, user.tokens)) {
-                        return res.send({
-                            "success": true,
-                            "friends": user.friends,
-                            "suitors": user.pending
+                        User.find({
+                            "username": { $in: user.friends }
+                        }, function (err, frds) {
+                            return res.send({
+                                "success": true,
+                                "friends": frds,
+                                "suitors": user.pending
+                            });
                         });
                     } else {
                         // Bad access token

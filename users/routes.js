@@ -322,7 +322,7 @@ var user = {
                     if (check.token(p.accessToken, user.tokens)) {
                         User.find({
                             "username": { $in: user.friends }
-                        }, function (err, frds) {
+                        }, 'username latitude longitude', function (err, frds) {
                             return res.send({
                                 "success": true,
                                 "friends": frds,

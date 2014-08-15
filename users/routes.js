@@ -1,5 +1,5 @@
 /*
-*  All routes for the User model
+*  All routes for the User
 *  @todo fix the way we check access tokens in every route (middleware)
 *  @todo implement a client secret code
 */
@@ -370,6 +370,20 @@ var friends = {
                                     isPending = true;
                                     break;
                                 }
+                            }
+                            // Check if username is already a friend
+                            var isFriend = false;
+                            for (var i = 0; i < user.friends.length; ++i) {
+                                if (p.username == user.friends[i]) {
+                                    isFriend = true;
+                                    break;
+                                }
+                            }
+                            if (isFriend) {
+                                return res.send({
+                                    "success": false,
+                                    "message": "ALREADY FRIEND"
+                                });
                             }
                             if (isPending) {
                                 // Move friend to user.friends

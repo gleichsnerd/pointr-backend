@@ -16,6 +16,7 @@ Friend-based wayfinding.
 "USERNAME EXISTS"
 "BAD ACCESS TOKEN"
 "USER NOT FOUND"
+"ALREADY FRIEND"
 ```
 
 ## User Routes
